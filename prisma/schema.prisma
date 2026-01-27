@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  ownedBills    Bill[]    @relation("Owner") 
+  memberships   Member[]  
+}
+
+model Bill {
+  id              String   @id @default(uuid())
+  title           String   @default("New Bill")
+  receiptImageUrl String?  
+  taxRate         Decimal  @default(0) 
+  serviceRate     Decimal  @default(0) 
+  status          BillStatus @default(OPEN)
+  paymentNote     String? 
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  ownerId String
+  owner   User   @relation("Owner", fields: [ownerId], references: [id])
+  
+  items   Item[]
+  members Member[]
+}
+
+model Member {
+  id            String   @id @default(uuid())
+  name          String  
+  status        PaymentStatus @default(UNPAID)
+  isOwner       Boolean  @default(false)
+
+  billId        String
+  bill          Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+
+  assignments   Assignment[]
+}
+
+model Item {
+  id       String   @id @default(uuid())
+  name     String
+  price    Decimal 
+  quantity Int      @default(1)
+
+  billId   String
+  bill     Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  
+  assignments Assignment[]
+}
+
+model Assignment {
+  id        String   @id @default(uuid())
+  portion   Decimal  @default(1)
+
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, memberId]) 
+}
+
+enum BillStatus {
+  OPEN
+  LOCKED
+  SETTLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  VERIFIED
+  PAID
+}
