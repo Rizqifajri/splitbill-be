@@ -23,8 +23,9 @@ model Bill {
   receiptImageUrl String?  
   taxRate         Decimal  @default(0) 
   serviceRate     Decimal  @default(0) 
+  discount        Decimal @default(0)
   status          BillStatus @default(OPEN)
-  paymentNote     String? 
+  paymentDetails     String? 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -63,16 +64,25 @@ model Item {
 
 model Assignment {
   id        String   @id @default(uuid())
-  portion   Decimal  @default(1)
-
+  
   itemId    String
   item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   
   memberId  String
   member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+ 
+  portion   Decimal  @default(1) 
 
-  @@unique([itemId, memberId]) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+// JANGAN LUPA UPDATE MODEL ITEM & MEMBER JUGA
+// Tambahkan field ini di dalam model Item:
+// assignments Assignment[]
+
+// Tambahkan field ini di dalam model Member:
+// assignments Assignment[]
 
 enum BillStatus {
   OPEN
