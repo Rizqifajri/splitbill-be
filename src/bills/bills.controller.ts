@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { BillsService } from './bills.service';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
+import { AssignItemDto } from 'src/assign-item/dto/assign-item-dto';
 
 @Controller('bills')
 export class BillsController {
@@ -10,6 +11,11 @@ export class BillsController {
   @Post()
   create(@Body() createBillDto: CreateBillDto) {
     return this.billsService.create(createBillDto);
+  }
+
+  @Post('assign')
+  assignItem(@Body() assignItemDto: AssignItemDto) {
+    return this.billsService.assignItem(assignItemDto);
   }
 
   @Get()
