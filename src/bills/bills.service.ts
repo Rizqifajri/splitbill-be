@@ -6,6 +6,7 @@ import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { AssignItemDto } from 'src/assign-item/dto/assign-item-dto';
+import { UpdateItemDto } from './dto/update-item.dto';
 
 @Injectable()
 export class BillsService {
@@ -66,6 +67,32 @@ export class BillsService {
       },
     });
   }
+
+  async updateItem(itemId: string, dto: UpdateItemDto) {
+    const item = await this.prisma.item.findUnique({
+      where: { id: itemId },
+    });
+    if(!item) throw new NotFoundException(`Item with id ${itemId} not found`);
+
+    return this.prisma.item.update({
+      where: { id: itemId },
+      data: {
+        ...dto,
+      },
+    })
+  }
+
+  async deleteItem(itemId: string) {
+    const item = await this.prisma.item.findUnique({
+      where: { id: itemId },
+    });
+    if(!item) throw new NotFoundException(`Item with id ${itemId} not found`);
+
+    return this.prisma.item.delete({
+      where: { id: itemId },
+    });
+  }
+
 
   async assignItem(dto: AssignItemDto) {
     const item = await this.prisma.item.findUnique({
