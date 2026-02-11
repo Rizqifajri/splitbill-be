@@ -3,6 +3,7 @@ import { BillsService } from './bills.service';
 import { CreateBillDto } from './dto/create-bill.dto';
 import { UpdateBillDto } from './dto/update-bill.dto';
 import { AssignItemDto } from 'src/assign-item/dto/assign-item-dto';
+import { UpdateItemDto } from './dto/update-item.dto';
 
 @Controller('bills')
 export class BillsController {
@@ -33,8 +34,18 @@ export class BillsController {
     return this.billsService.update(id, updateBillDto);
   }
 
+  @Patch('items/:itemId')
+  updateItem(@Param('itemId') itemId: string, @Body() updateItemDto: UpdateItemDto) {
+    return this.billsService.updateItem(itemId, updateItemDto);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.billsService.remove(id);
+  }
+
+  @Delete('items/:itemId')
+  removeItem(@Param('itemId') itemId: string) {
+    return this.billsService.deleteItem(itemId);
   }
 }
